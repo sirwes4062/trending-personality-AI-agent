@@ -1,6 +1,9 @@
 import { registerApiRoute } from '@mastra/core/server';
 import { randomUUID } from 'crypto';
 
+// Explicit type for message part
+type MessagePart = { kind: 'text'; text: string } | { kind: 'data'; data: any };
+
 export const a2aAgentRoute = registerApiRoute('/a2a/agent/:agentId', {
   method: 'POST',
   handler: async (c) => {
@@ -39,7 +42,7 @@ export const a2aAgentRoute = registerApiRoute('/a2a/agent/:agentId', {
       // Extract messages from params
       const { message, messages, contextId, taskId, metadata } = params || {};
 
-      let messagesList = [];
+      let messagesList: Array<{ role: string; parts: MessagePart[]; messageId?: string; taskId?: string }> = [];
       if (message) {
         messagesList = [message];
       } else if (messages && Array.isArray(messages)) {
@@ -47,21 +50,24 @@ export const a2aAgentRoute = registerApiRoute('/a2a/agent/:agentId', {
       }
 
       // Convert A2A messages to Mastra format
-      const mastraMessages = messagesList.map((msg) => ({
-        role: msg.role,
-        content: msg.parts?.map((part) => {
+      const mastraMessages: string[] = messagesList.map((msg) => 
+        msg.parts?.map((part: MessagePart) => {
           if (part.kind === 'text') return part.text;
           if (part.kind === 'data') return JSON.stringify(part.data);
           return '';
         }).join('\n') || ''
-      }));
+      ).filter(Boolean); // Filter out any empty strings
 
       // Execute agent
       const response = await agent.generate(mastraMessages);
       const agentText = response.text || '';
 
       // Build artifacts array
-      const artifacts = [
+      const artifacts: Array<{
+        artifactId: string;
+        name: string;
+        parts: { kind: string; text: string }[];
+      }> = [
         {
           artifactId: randomUUID(),
           name: `${agentId}Response`,
@@ -69,14 +75,14 @@ export const a2aAgentRoute = registerApiRoute('/a2a/agent/:agentId', {
         }
       ];
 
-      // Add tool results as artifacts if present
+      // Add tool results as artifacts if present (serialize as text for compatibility)
       if (response.toolResults && response.toolResults.length > 0) {
         artifacts.push({
           artifactId: randomUUID(),
           name: 'ToolResults',
           parts: response.toolResults.map((result) => ({
-            kind: 'data',
-            data: result
+            kind: 'text',
+            text: JSON.stringify(result)
           }))
         });
       }
