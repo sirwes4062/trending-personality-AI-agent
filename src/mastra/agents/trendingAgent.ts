@@ -4,6 +4,7 @@ import { Memory } from "@mastra/memory";
 import { LibSQLStore } from "@mastra/libsql";
 import { newsTool } from "../tools/news-tool";
 import { googleTool } from "../tools/google-tool";
+import { trendingInfoTool } from "../tools/trendingInfoTool";
 
 export const trendingAgent = new Agent({
   name: "Trending Personality Agent",
@@ -26,7 +27,7 @@ export const trendingAgent = new Agent({
     - **Further Reading Link:** A direct URL to a reliable source from the Google search for more in-depth information.
   `,
   model: "google/gemini-2.0-flash",
-  tools: { newsTool, googleTool },
+  tools: { newsTool, googleTool, trendingInfoTool },
   memory: new Memory({
     storage: new LibSQLStore({
       url: "file:mastra.db",
