@@ -7,9 +7,8 @@ import { a2aAgentRoute } from './routes/a2a';
 
 export const mastra = new Mastra({
   agents: { trendingAgent },
-  routes: [a2aAgentRoute],
+  // routes: [a2aAgentRoute],
   storage: new LibSQLStore({
-    // stores observability, scores, ... into memory storage, if it needs to persist, change to file:../mastra.db
     url: ":memory:",
   }),
   logger: new PinoLogger({
@@ -17,13 +16,15 @@ export const mastra = new Mastra({
     level: 'info',
   }),
   telemetry: {
-    // Telemetry is deprecated and will be removed in the Nov 4th release
     enabled: false, 
   },
   observability: {
-    // Enables DefaultExporter and CloudExporter for AI tracing
     default: { enabled: true }, 
   },
+
+   server: {
+    apiRoutes: [a2aAgentRoute]
+  }
 });
 
 
