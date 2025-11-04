@@ -5,7 +5,7 @@ import fetch from "node-fetch";
 import nlp from "compromise"; // npm install compromise
 
 export const newsTool = createTool({
-  id: "get-trending-person",
+  id: "get-trending-news",
   description: "Fetch and extract the most trending person or topic from multiple news sources",
   inputSchema: z.object({}),
   outputSchema: z.object({
