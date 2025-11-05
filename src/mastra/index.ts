@@ -4,10 +4,12 @@ import { PinoLogger } from '@mastra/loggers';
 import { LibSQLStore } from '@mastra/libsql';
 import { trendingAgent } from "./agents/trendingAgent";
 import { a2aAgentRoute } from './routes/a2a';
+// import { trendingRoute } from './routes/trending-route';
 
 export const mastra = new Mastra({
+  bundler: {externals: ['express']},
+
   agents: { trendingAgent },
-  // routes: [a2aAgentRoute],
   storage: new LibSQLStore({
     url: ":memory:",
   }),
@@ -26,6 +28,7 @@ export const mastra = new Mastra({
     apiRoutes: [a2aAgentRoute]
   }
 });
+
 
 
 
