@@ -7,6 +7,7 @@ import { googleTool } from "../tools/google-tool";
 import { trendingInfoTool } from "../tools/trendingInfoTool";
 
 export const trendingAgent = new Agent({
+  id:"trendingAgent",
   name: "Trending Personality Agent",
   instructions: `
     You are an AI assistant that identifies top trending personalities or topics from news headlines
